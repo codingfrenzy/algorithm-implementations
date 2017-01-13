@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class BST {
 
@@ -105,7 +106,7 @@ public class BST {
     /*
         At each level, add the current node into the list and then recurse for the child levels.
      */
-    public static void listOfNodesPerLevel(TreeNode node, int level, ArrayList<ArrayList<TreeNode>> levels) {
+    private static void listOfNodesPerLevel(TreeNode node, int level, ArrayList<ArrayList<TreeNode>> levels) {
         if (node == null) {
             return;
         }
@@ -136,6 +137,69 @@ public class BST {
         listOfNodesPerLevel(node.getRightChild(), level + 1, levels);
     }
 
+    /*
+    Use BFS in the tree.
+    A queue stores all the children of the current level.
+    Remove from queue as elements are printed (visited)
+     */
+    public static void printLevelOrderTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        class TreeLevels {
+            TreeNode node;
+            int level;
+
+            public TreeLevels(TreeNode node, int level) {
+                this.node = node;
+                this.level = level;
+            }
+
+            public String toString() {
+                return "Level: " + level + " Node:" + node;
+            }
+        }
+
+        LinkedList<TreeLevels> queue = new LinkedList<>();
+        TreeLevels rootNode = new TreeLevels(root, 0);
+        queue.addLast(rootNode);
+        // root node is in queue
+        TreeLevels currentNode = queue.peekFirst();
+
+        while (!queue.isEmpty()) {
+            System.out.println();
+            // this is for keeping track of levels.
+            // after all nodes in a level are traversed, break the loop
+            int level = currentNode.level;
+
+            while (currentNode != null && level == currentNode.level) {
+                // remove first node from queue after printing
+                System.out.print(currentNode.node + ", ");
+                queue.removeFirst();
+
+                // if children exists, add them to queue with the level + 1
+                TreeNode node;
+                node = currentNode.node.getLeftChild();
+                if (node != null) {
+                    queue.addLast(new TreeLevels(node, level + 1));
+                }
+                node = currentNode.node.getRightChild();
+                if (node != null) {
+                    queue.addLast(new TreeLevels(node, level + 1));
+                }
+
+                // If queue is empty after having traversed through all children, break out
+                if (queue.isEmpty()) {
+                    currentNode = null;
+                } else {
+                    currentNode = queue.peekFirst();
+                }
+            }
+        }
+
+    }
+
     public static void main(String[] args) {
         insertIterative(50);
         insertIterative(30);
@@ -147,12 +211,13 @@ public class BST {
         insertIterative(35);
         insertIterative(33);
 
-        printInorderRecursive(root);
-        System.out.println();
-        printPreorderRecursive(root);
-        System.out.println();
-        printPostorderRecursive(root);
-        System.out.println();
-        System.out.println(listOfNodesPerLevel(root));
+//        printInorderRecursive(root);
+//        System.out.println();
+//        printPreorderRecursive(root);
+//        System.out.println();
+//        printPostorderRecursive(root);
+//        System.out.println();
+//        System.out.println(listOfNodesPerLevel(root));
+        printLevelOrderTraversal(root);
     }
 }
